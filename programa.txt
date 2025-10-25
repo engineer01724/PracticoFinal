@@ -1,0 +1,51 @@
+
+funciones que necesitamos:
+
+	atacar()
+	defender()
+	curar()
+	accion_enemigo
+	accion_jugador
+	mostrar_datos_personaje
+	pedir recurso arr de personajes/turnos
+	agregar personajes/turnos
+	
+	crear personaje nuevo -> opcional
+
+
+estructuras principales:
+	personaje_t -> datos del personaje
+	turno_t -> resultados y acciones del turno
+
+Programa:
+
+	--se piden al usuario que elija su personajes y el del rival
+
+	--se llena la estructura jugador_t de la maquina y el usuario con 
+	los datos del personaje_t elegido.
+
+	--Se comienza el juego.
+
+	Empieza el usuario
+	
+	Se le da la opcion al usuario de atacar/defender/curar. Si la eleccion elegida
+	no es coherente con el estado actual del personaje (ej. curarse con vida 100%), 
+	se le da la opcion de hacerlo de nuevo.
+
+
+	Turno de la IA:
+	
+	La IA, por default, atacara al jugador. Si alguna condicion especifica se presetna,
+	actuara acorde.
+	
+	Luego de que ambos hayan seleccionado:
+
+	se realiza la accion y se muestra el resultado en las estadisticas de la maquina.
+
+	Luego de cada ataque de la IA, se muestra lo sucedido en el anterior turno.
+
+	
+	
+	
+
+	
