@@ -1,5 +1,4 @@
 #ifndef COMBATE
-
     #define COMBATE
     #define EULER 2.7182818
 
@@ -10,50 +9,48 @@
     #include "combate.h"
 
     typedef enum
-    {
-        CURAR = 1,
+    { 
+        NINGUNA,
         ATAQUE,
-        DEFENSA
+        DEFENSA,
+        CURAR,
+        RANDOM
     }accion_activa_t;
+
     typedef struct
     {
-        char nombre[24];
-        char descripcion[64];
-        int max_vida;
-        int max_energia;
-        int plus_ataque;
-        int capac_curacion;
+        int vida;
+        int energia;
+        int ataque;
+        int curacion;
+        int defensa;
         float reduccion_escudo;
-        float reduccion_defensa;
         float penetracion_escudo;
     }personaje_t;
 
     typedef struct
     {
-        char nombre_jugador[32];
         float vida;
         int energia;
-        int puntos_escudo;
-        bool escudo;
+        bool vivo;
         personaje_t personaje;
     }jugador_t;
 
     typedef struct
     {
-        float danio_causado;
-        int puntos_escudo_quitados;
+        int danio_causado;
         int energia_reducida; 
     }ataque_t;
 
     typedef struct
     {
-        float danio_after_reduction;
+        int danio_after_reduction;
         int energia_ganada;
     }defensa_t;
 
     typedef struct
     {
-        float vida_agregada;
+        int vida_agregada;
         int energia_agregada;
         bool escudo;
     }curar_t;
@@ -68,35 +65,170 @@
 
     typedef struct
     {
-        size_t cant_turnos;
-        char accion_previa_jugad[16];
-        char accion_previa_maquin[16];
-        int escudo_restante_jugador;
-        int escudo_restante_maquina;
+        char accion_jugad[16];
+        char accion_maquin[16];
         int vida_restante_jugador;
-        int vida_restante_maquina;
+        int escudo_restante_jugador;
         int energia_restante_jugador;
+        int vida_restante_maquina;
+        int escudo_restante_maquina;
         int energia_restante_maquina;
+        size_t turno;
     }turno_t;
 
+    /**
+        @brief Esta funcion crea un arreglo dinamico de elementos de tipo turno_t 
+        de capacidad tamanio.
+
+        @param tamanio es el tamanio del arreglo que se quiere crear.
+
+        @pre tamanio debe ser > 0.
+
+        @return un puntero a la memoria dinamica donde se aloja el recurso del 
+        arreglo de turno_t(s).
+
+        @post Se creo y retorno el recurso pedido, de tamanio tamanio.
+
+        @invariant tamanio no cambia de valor.
+    */
+    turno_t *crear_arreglo_turnos(const size_t tamanio);
     
+    /**
+        @brief La funcion agrega una cantidad de elementos a un arreglo de turno_t(s).
+
+        @param [out] arr_turno es un puntero al arreglo de turno_t al que se quiere
+        agregar mas elementos.
+
+        @param cant_actual es la cantidad actual de elementos del arreglo.
+
+        @param cant_agregar es la cantidad de elementos que se quiere agregar.
+
+        @pre cant_actual debe ser > 0. cant_agregar debe ser > 0.
+
+        @return un puntero a un nuevo arreglo dinamico de tamanio cant_actual + 
+        cant_agregar.
+    */
+    turno_t *agregar_turno(turno_t *arr_turno, size_t cant_actual, size_t cant_agregar);
+    
+    /**
+        @brief Esta funcion crea un arreglo dinamico de elementos de tipo personaje_t
+        de capacidad tamanio.
+        
+        @details La funcion llamadora es encargada de liberar el recurso creado 
+        haciendo uso de la funcion 'destruir_memoria'.
+
+        @param tamanio es el tamanio del cual se quiere crear el arreglo.
+
+        @pre tamanio deb ser > 0.
+
+        @return un puntero a la memoria del heap donde se aloja el recuros recien
+        creado.
+
+        @post Se creo y retorno el recurso de tamanio tamanio.
+    */
+    personaje_t *crear_arreglo_personajes(const size_t tamanio);
+
+    /**
+        @brief Esta funcion imprime un personaje_t.
+
+        @param [in] personaje es un puntero a la estructura de tipo personaje_t
+        que desea imprimirse.
+
+        @pre personaje debe ser un puntero a una direccion != NULL de tipo personaje_t.
+
+        @post Se imprimio el personaje. 
+
+        @invariant personaje no es modificado.
+    */
+    void imprimir_personaje(personaje_t *personaje);
+
+    /**
+        @brief Esta funcion destruye memoria dinamica previamente pedida.
+        
+        @param [in, out] ptr_mem es un puntero al puntero que apunta a la direccion 
+        dinamica que se desea liberar.
+
+        @post Se libero la memoria dinamica y al puntero a la misma se le ha asignado 
+        el valor NULL.
+    */
+    void destruir_memoria(void **ptr_mem);
+
+    /**
+        @brief Esta funcion llena una estructura de tipo turno_t.
+
+        @details La funcion toma los datos de los dos jugadores y extrae los datos 
+        necesarios para almacenar la informacion de los jugadores luego de que el
+        turno haya terminado.
+
+        @param [in] jugador es un puntero a una estructura de tipo jugador_t con
+        los datos del jugador humano. Estos datos seran usados para llenar los 
+        campos correspondientes del turno.
+
+        @param [in] maquina es un puntero a una estructura de tipo jugador_t con
+        los datos de la maquina. Estos datos seran usados para llenar los campos 
+        correspondientes del turno.
+
+        @param turno es el numero de turno recien jugado.
+
+        @param accion_jugad es la accion que tomo el jugador. Segun cual fue, se
+        convertira a una cadena y se guardara en el campo accion_jugad.
+
+        @param accion_jugad es la accion que tomo la maquina. Segun cual fue, se
+        convertira a una cadena y se guardara en el campo accion_maquin.
+
+        @pre turno debe ser > 0. jugador y maquina deben ser puntero a una memoria
+        != NULL de tipo jugador_t.
+
+        @return una estructura de tipo turno_t con los datos del turno recien jugado.
+
+        @post Los datos del turno han sido guardados y devueltos al programa 
+        principal.  
+
+        @invariant tanto jugador como maquina como turno no se ven modificados.
+    */
+    turno_t llenar_struct_turno(const jugador_t *const jugador, 
+    const jugador_t *const maquina, const size_t turno, int accion_jugad, 
+    int accion_maquin);
+
+    
+    /**
+        @brief Esta funcion imprime una estructura de tipo turno_t
+
+        @param [in] turno es el puntero a la estructura de tipo turno_t que se desea
+        imprimir.
+
+        @pre turno debe ser un puntero a una memoria != NULL de tipo turno_t.
+
+        @post Se imprimio el arreglo.
+
+        @invariant turno no es modificado.
+    */
+    void imprimir_turno(const turno_t *const turno);
+
+    /**
+        @brief Esta funcion crea un personaje con estadisticas random y lo devuelve.
+
+        @details Esta funcion utilizara mucho la funcion rand() para obtener valores
+        random dentro de un cierto rango, para asegurar que cada vez los personajes
+        tengan estadisticas diferentes.Los rangos son los especificados en la 
+        documentacion de la estructura personaje_t.
+
+        @return Un personaje_t con estadisticas random.
+
+        @post El personaje creado y retornado tiene estadisticas elegidas al azar.
+    */
+    personaje_t crear_personaje_random();
+
     /**
         @brief La funcion calcula el danio de un ataque de un jugador a otro.
 
         @details Toma las estadisticas de los personajes de cada jugador 
-        y del estado actual de cada jugador. ATENCION: No modifica las estructuras
-        que contienen los datos de los jugadores. Lo que hace es guardar los datos 
-        que afecta en una estructura de tipo ataque_t y la retorna.
-        
-        @param [in] personaje_atacado es un puntero a una estructura de tipo 
-        personaje_t que tiene la informacion del personaje del jugador que es 
-        atacado. Es usado para calcular el danio causado por el ataque al jugador
-        atacado en base a la capacidad de reduccion que este tiene.
-
-        @param [in] personaje_atacante es un puntero a una estructura de tipo 
-        personaje_t. Muy similar al anterior parametro; esta estructura contiene
-        los datos del atacante, que son usados para calcular el danio que el
-        personaje del jugador atacante hara.
+        y del estado actual de cada jugador. 
+        ATENCION: No modifica las estructuras que contienen los datos de los 
+        jugadores. Lo que hace es guardar los datos que afecta en una estructura de 
+        tipo ataque_t y la retorna.
+        IMPORTANTE: Los datos del personaje utilizado por cada jugador estan dentro 
+        de las estructuras jugador_t.
 
         @param [in] jugad_atacado es un puntero a una estructura de tipo
         jugador_t. Esta estructura contiene las estadisticas actuales del jugador
@@ -116,11 +248,9 @@
 
         @post La cantidad de danio causado es igual al valor de retorno.
 
-        @invariant personaje_atacado, personaje_atacante, jugad_atacado, 
-        jugad_atacante NO son modificados.
+        @invariant jugad_atacado y jugad_atacante NO son modificados.
     */
-    ataque_t calcular_ataque(const personaje_t *const personaje_atacado, 
-    const personaje_t *const personaje_atacante, const jugador_t *const jugad_atacado, 
+    ataque_t calcular_ataque(const jugador_t *const jugad_atacado, 
     const jugador_t *const jugad_atacante);
 
     /**
@@ -130,11 +260,8 @@
         por el jugador rival. Es por esto que recibira un parametro que representa
         el danio causado por el rival. Este sera reducido dependiendo de las 
         estadisticas del jugador y del personaje atacado.
-
-        @param [in] personaje_en_defensa es un puntero a una estructura de tipo
-        personaje_t. Esta estructura tiene los datos del personaje del jugador
-        que se esta defendiendo. Es usado para calcular el danio que reduce de manera
-        default mas el plus que la accion de defensa proporciona.
+        IMPORTANTE: Los datos del personaje utilizado estan dentro de la estructuras 
+        jugador_t, en el miembro 'personaje'
 
         @param [in] jugador_en_defensa es un puntero a una estructura de tipo
         jugador_t. Esta estructura contiene los datos del estado actual del personaje
@@ -142,16 +269,16 @@
 
         @param danio_causado es el danio original que causaria el rival.
 
-        @pre Todas los punteros a las estructuras deben ser != NULL a memorias  
-        correspondientes a su tipo.
+        @pre El puntero a la estructura jugador_en_defensa debe apuntar a una 
+        memoria != NULL de tipo jugador_t.
 
         @return una estructura de tipo defensa_t con los el danio ya reducido y
         la energia ganada.
-        @post Las estructuras personaje_en_defensa y jugador_en_defensa NO son
-        mofidicadas.
+
+        @post La estructura jugador_en_defensa NO es modificadas.
     */
-    defensa_t calcular_defensa(const personaje_t *const personaje_en_defensa, 
-    jugador_t *jugador_en_defensa, const float danio_causado);
+    defensa_t calcular_defensa(jugador_t *jugador_en_defensa, 
+    const int danio_causado);
 
     /**
         @brief Esta funcion realiza la accion de curar de un jugador.
@@ -174,11 +301,91 @@
     curar_t curar_jugador(const jugador_t *const jugador)
 
     /**
+        @brief Esta funcion randomiza la accion de un jugador.
+
+        @details Puede tomar cualquiera de las 3 accione posibles (DEFENDER, ATACAR,
+        CURAR). La unica restriccion es que si la vida del jugador esta llena, o la 
+        capacidad de curacion del personaje del jugador es mayor a la diferencia entre
+        la vida maxima y la vida actual, la accion de curacion no sera elegida.
+        Para la eleccion random, re hace uso de la funcion rand().
+
+        @param [in] jugador es un puntero a la estructura con los datos del jugador
+        que quiere randomizar su accion. Se usa para restringir la curacion si se
+        cumple uno de los casos detallados en la seccion 'details'.
+
+        @pre jugador debe ser un puntero a una memoria != NULL de tipo jugador_t.
+        
+        @return La accion a tomar, determinada de manera random.
+
+        @post El valor de retorno es == a la accion que se tomara, elegida de manera
+        random.
+        
+        @invariant jugador no es modificado de ninguna manera.
+    */
+    int randomizar_accion(const jugador_t *const jugador);
+
+    /**
+        @brief Esta funcion elige que accion realizara la maquina.
+
+        @details La funcion toma las estadisticas actuales del jugador humano y de
+        la maquina y, en base a ellas, decide cual es la accion mas optima a tomar.
+        CASOS: La vida de la maquina es muy baja -> CURAR. Energia baja -> DEFENDER.
+        Vida del jugador baja -> ATACAR. Si ninguna accion es preferible -> RANDOM.
+        Esta ultima accion sera gestionada por la funcion 'randomizar_accion'.
+        Las otras seran gestionadas por la funcion correspondiente.
+
+        @param [in] jug_humano es un puntero a la estructura donde se alojan los
+        datos del jugador humano. Se usan para determinar la accion a tomar.
+
+        @param [in] jug_maquina es  es un puntero a la estructura donde se alojan los
+        datos del jugador de la maquina. Se usa tambien para determinar la accion 
+        a tomar.
+
+        @pre Tanto jug_humano como jug_maquina deben ser puntero a memorias != NULL
+        de tipo jugador_t.
+
+        @return La accion que la maquina seguira en el corriente turno. Los casos
+        estan detallados en la seccion 'details'.
+    */
+    int decision_accion_maquina(const jugador_t *const jug_humano, 
+    const jugador_t *const jug_maquina);
+
+    /**
         @brief La funcion modifica una estructura de tipo jugador_t con los  
         datos de la estructura accion_jugad.
 
-        @details La estructura accion_jugad contiene una union dentro con los datos 
+        @details La estructura accion_jugad contiene una union dentro con los 
+        datos que pueden afectar las estadisticas del jugador: el ataque del rival;
+        el ataque del jugador; la defensa del jugador; la curacion del jugador.
+        Se decidira cual de las estructuras con datos del jugador se toma en cuenta
+        dependiendo de la accion tomada por el jugador (param accion). Y se tomara
+        en cuenta la accion rival si ataque_rival == true.
+
+        @param [out] jugador es un puntero a una estructura de tipo jugador_t. Esta 
+        sera modificada con los datos en la estructura accion_jugad.
+
+        @param [in] accion_jugad  es un puntero a una estructura de tipo 
+        accion_jugador_t. Esta tiene 4 estructuras dentro (ir a details para mas
+        detalles). Se usa para modificar los datos de jugador.
+
+        @param accion representa la accion que realizo el jugador en el ultimo turno.
+        Se usa para saber cual de las estructuras dentro de accion_jugador_t se 
+        debe usar para modificar los datos del jugador.
+
+        @param ataque_rival es una bandera para saber si el jugador rival realizo
+        la accion de ataque, que es la unica accion del rival que puede afectar
+        a las estadisticas del jugador el cual se esta modificando. Si es == true,
+        se modifican las estadisticas correspondientes del jugador en base a los 
+        datos del miembro de accion_jugad 'ataque_rival'.
+
+        @pre Los punteros a estructuras jugador y accion_jugad deben apuntar a
+        memorias != NULL de tipo jugador_t y accion_jugador_t respectivamente.
+        accion debe obtener su valor de la enum accion_activa_t.
+
+        @post La estructura del jugador que esta siendo modificado fue modificada
+        con los datos correspondientes.
     */
-    void modificar_jugador(jugador_t *jugador, accion_jugador_t accion_jugad);
+    void modificar_jugador(jugador_t *jugador, accion_jugador_t *accion_jugad, 
+    int accion, bool ataque_rival);
 
 #endif
