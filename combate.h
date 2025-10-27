@@ -1,7 +1,7 @@
 #ifndef COMBATE
     #define COMBATE
     #define EULER 2.7182818
-
+    #define CONST_DEFENSA 0.7
     #include<stdio.h>
     #include<stdlib.h>
     #include<string.h>
@@ -19,19 +19,21 @@
 
     typedef struct
     {
-        int vida;
-        int energia;
-        int ataque;
-        int curacion;
-        int defensa;
-        float reduccion_escudo;
-        float penetracion_escudo;
+        int vida; //Vida del personaje. Puede estar en el rango de [1300 - 1700].
+        int energia; //Energia del personaje. Puede estar en el rango de [70 - 100]. 
+        int ataque; //Plus de ataque del personaje. Puede en el rango [50 - 70].
+        int curacion; //Capacidad de curacion del personaje. Rango: [200 - 350].
+        int aumento_energia; //Aumento de energia producido en la accion de curar.
+        int reduc_energ_ataq; //Cantidad de energia reducida al realizar un ataque.
+        float red_danio; //Toma su valor del macro CONST_DEFENSA. 
     }personaje_t;
+
 
     typedef struct
     {
-        float vida;
+        int vida;
         int energia;
+        bool defensa; //Decision de aplicar o no la reduccion de la defensa.
         bool vivo;
         personaje_t personaje;
     }jugador_t;
@@ -52,14 +54,14 @@
     {
         int vida_agregada;
         int energia_agregada;
-        bool escudo;
+        bool defensa;
     }curar_t;
 
     typedef struct
     {
-        ataque_t ataque_rival,
-        ataque_t ataque,
-        curar_t curar,
+        ataque_t ataque_rival;
+        ataque_t ataque;
+        curar_t curar;
         defensa_t defensa
     }accion_jugador_t;
 
@@ -81,8 +83,6 @@
         de capacidad tamanio.
 
         @param tamanio es el tamanio del arreglo que se quiere crear.
-
-        @pre tamanio debe ser > 0.
 
         @return un puntero a la memoria dinamica donde se aloja el recurso del 
         arreglo de turno_t(s).
@@ -129,18 +129,20 @@
     personaje_t *crear_arreglo_personajes(const size_t tamanio);
 
     /**
-        @brief Esta funcion imprime un personaje_t.
+        @brief Esta funcion toma la accion del jugador y la convierte a una cadena.
 
-        @param [in] personaje es un puntero a la estructura de tipo personaje_t
-        que desea imprimirse.
+        @details Esta funcion devuelve un puntero a memoria dinamica donde se aloja
+        el literal de cadena que describe la accion realizada. La funcion llamadora
+        es responsable de liberar la memoria haciendo uso de la funcion :
+        destruir_memoria.
+        @param accion_jugador es la accion tomada por el jugador, en formato int.
 
-        @pre personaje debe ser un puntero a una direccion != NULL de tipo personaje_t.
+        @pre accion_jugador debe corresponder a una de las acciones de la struct
+        accion_activa_t.
 
-        @post Se imprimio el personaje. 
-
-        @invariant personaje no es modificado.
+        @return un puntero a una cadena con la accion realizada.
     */
-    void imprimir_personaje(personaje_t *personaje);
+    char *accion_a_cadena(int accion_jugador);
 
     /**
         @brief Esta funcion destruye memoria dinamica previamente pedida.
@@ -152,6 +154,20 @@
         el valor NULL.
     */
     void destruir_memoria(void **ptr_mem);
+    
+    /**
+        @brief Esta funcion imprime un personaje_t.
+
+        @param [in] personaje es un puntero a la estructura de tipo personaje_t
+        que desea imprimirse.
+
+        @pre personaje debe ser un puntero a una direccion != NULL de tipo personaje_t.
+
+        @post Se imprimio el personaje. 
+
+        @invariant personaje no es modificado.
+    */
+    void imprimir_personaje(const personaje_t *const personaje);
 
     /**
         @brief Esta funcion llena una estructura de tipo turno_t.
@@ -203,7 +219,7 @@
 
         @invariant turno no es modificado.
     */
-    void imprimir_turno(const turno_t *const turno);
+    void imprimir_turno(const turno_t *const turno_print);
 
     /**
         @brief Esta funcion crea un personaje con estadisticas random y lo devuelve.
@@ -218,6 +234,32 @@
         @post El personaje creado y retornado tiene estadisticas elegidas al azar.
     */
     personaje_t crear_personaje_random();
+
+    /**
+        @brief Reduce la energia de un jugador.
+
+        @details Luego de cada turno, el juego reducira la energia de ambos
+        jugador en una constante definida antes de comenzar el juego. Esta funcion
+        hace eso. La funcion contempla el caso de que modificar energ_reduc al jugador
+        supere los limites establecidos. En ese caso, setea su energia a 1 o al maximo
+        posible, dependiendo de que limite se rompio.
+
+        @param [in, out] jugador es un puntero a la esturctura jugador_t del jugador
+        del cual se desea modificar la energia.
+        
+        @param energia_modificar es la energia que se desea modificar al usuario.
+        Esta puede ser negativa (para restarle esa cantidad al jugador) o positiva
+        (para sumarle esa cantidad al jugador).
+
+        @pre energia_jugador debe ser un puntero a una memoria != NULL la estructura
+        del jugador del cual se quiere modificar su energia. energia_modificar 
+        debe ser != 0.
+
+        @post Se modifico el miembro 'energia' proporcionado.
+
+        @invariant energia_modificar no es modificado.
+    */
+    void modificar_energia_jugador(jugador_t *jugador, int energia_modificar);
 
     /**
         @brief La funcion calcula el danio de un ataque de un jugador a otro.

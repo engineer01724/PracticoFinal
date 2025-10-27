@@ -8,6 +8,8 @@
 int main(void)
 {
     srand(time(NULL));
+    int suma_energia = 15;
+    int resta_energia = 20;
     int num_personaje_human = 0;
     int num_personaje_maquin = 0;
     size_t num_turnos = 1;
@@ -74,6 +76,7 @@ int main(void)
     imprimir_personaje(&maquina.personaje);
 
     turnos[0] = llenar_struct_turno(jugador, maquina, 0, NINGUNA, NINGUNA);
+    imprimir_turno(&turnos[0]);
 
     for(size_t i = 0; end_of_game == false; i++)
     {
@@ -169,6 +172,15 @@ int main(void)
         }
 
         turnos = agregar_turno(turnos, num_turnos, 1);
+        if(turnos == NULL)
+        {
+            fprintf(stderr, "Error critico al agregar nuevo turno. Terminando programa");
+            return EXIT_FAILURE;
+        }
+        
+        energia_modificar(&jugador.energia, suma_energia);
+        energia_modificar(&jugador.energia, suma_energia);
+        
         turnos[num_turnos] = llenar_struct_turno();
         num_turnos++;
     }
