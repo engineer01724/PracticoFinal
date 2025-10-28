@@ -13,6 +13,9 @@
         int energia; //Energia del personaje. Puede estar en el rango de [70 - 100]. 
         int ataque; //Plus de ataque del personaje. Puede en el rango [50 - 70].
         int curacion; //Capacidad de curacion del personaje. Rango: [200 - 350].
+        int aumento_energia; //Aumento de energia producido en la accion de curar/defender.
+        int reduc_energ_ataq; //Cantidad de energia reducida al realizar un ataque,
+        //representada por un nro negativo (la cantidad a restar * -1).
         float red_danio; //Toma su valor del macro CONST_DEFENSA. 
     }personaje_t;
 
@@ -41,7 +44,6 @@
     {
         int vida_agregada;
         int energia_agregada;
-        bool escudo;
     }curar_t;
 
     typedef struct
@@ -51,6 +53,14 @@
         curar_t curar,
         defensa_t defensa
     }accion_jugador_t;
+
+    typedef enum
+    {   
+        NINGUNO = -4,
+        HUMANO,
+        MAQUINA,
+        AMBOS
+    }jugador_muerto_t
 
     typedef struct
     {

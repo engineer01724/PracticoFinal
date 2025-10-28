@@ -2,9 +2,12 @@
     #define COMBATE
     #define EULER 2.7182818
     #define CONST_DEFENSA 0.7
+    #define CONST_ACCION_DEFENSA 0.5
+
     #include<stdio.h>
     #include<stdlib.h>
     #include<string.h>
+    #include<stdbool.h>
     #include<math.h>
     #include "combate.h"
 
@@ -46,7 +49,7 @@
 
     typedef struct
     {
-        int danio_after_reduction;
+        int danio_luego_reduction;
         int energia_ganada;
     }defensa_t;
 
@@ -62,13 +65,21 @@
         ataque_t ataque_rival;
         ataque_t ataque;
         curar_t curar;
-        defensa_t defensa
+        defensa_t defensa;
     }accion_jugador_t;
+
+    typedef enum
+    {   
+        NINGUNO = -4,
+        HUMANO,
+        MAQUINA,
+        AMBOS,
+    }jugador_muerto_t;
 
     typedef struct
     {
-        char accion_jugad[16];
-        char accion_maquin[16];
+        char accion_jugad[32];
+        char accion_maquin[32];
         int vida_restante_jugador;
         int escudo_restante_jugador;
         int energia_restante_jugador;
@@ -76,6 +87,7 @@
         int escudo_restante_maquina;
         int energia_restante_maquina;
         size_t turno;
+        bool mem_ped_correct;
     }turno_t;
 
     /**
@@ -328,8 +340,7 @@
         @details La funcion no modifica el jugador originial. Lo que hace es 
         ingresar los datos que modifica a una estructura curar_t y la retorna.
         EL valor curacion e suna constante definida en la estructura del personaje
-        que esta utilizando el jugador. Tambien se le proporciona un plus de energia
-        proporcionar a su capacidad de curacion.
+        que esta utilizando el jugador. Tambien se le proporciona un plus de energia.
 
         @param [in] jugador es un puntero a una estructura jugador_t que contiene
         el personaje el cual esta usando. De aqui se sacara el valor de la capacidad
@@ -340,7 +351,7 @@
         @return una estructura curar_t con los datos de la curacion y gana de energia
         del jugador.
     */
-    curar_t curar_jugador(const jugador_t *const jugador)
+    curar_t curar_jugador(const jugador_t *const jugador);
 
     /**
         @brief Esta funcion randomiza la accion de un jugador.
@@ -349,7 +360,7 @@
         CURAR). La unica restriccion es que si la vida del jugador esta llena, o la 
         capacidad de curacion del personaje del jugador es mayor a la diferencia entre
         la vida maxima y la vida actual, la accion de curacion no sera elegida.
-        Para la eleccion random, re hace uso de la funcion rand().
+        Para la eleccion random, se hace uso de la funcion rand().
 
         @param [in] jugador es un puntero a la estructura con los datos del jugador
         que quiere randomizar su accion. Se usa para restringir la curacion si se
@@ -414,11 +425,9 @@
         Se usa para saber cual de las estructuras dentro de accion_jugador_t se 
         debe usar para modificar los datos del jugador.
 
-        @param ataque_rival es una bandera para saber si el jugador rival realizo
-        la accion de ataque, que es la unica accion del rival que puede afectar
-        a las estadisticas del jugador el cual se esta modificando. Si es == true,
-        se modifican las estadisticas correspondientes del jugador en base a los 
-        datos del miembro de accion_jugad 'ataque_rival'.
+        @param accion_rival Es la accion realizada por el rival. Se usa para determinar si
+        la accion del rival modifica las estadisticas del jugador. Esto solo sucede si
+        la accion del rival es == ATAQUE.
 
         @pre Los punteros a estructuras jugador y accion_jugad deben apuntar a
         memorias != NULL de tipo jugador_t y accion_jugador_t respectivamente.
@@ -428,6 +437,30 @@
         con los datos correspondientes.
     */
     void modificar_jugador(jugador_t *jugador, accion_jugador_t *accion_jugad, 
-    int accion, bool ataque_rival);
+    int accion, int accion_rival);
+    
+    /**
+        @brief La funcion determina si el juego ha finalizado.
 
+        @details LA funcion verifica que los dos jugadores tengan vida > 0. Si uno
+        de los dos no lo tiene, devuelve un valor negativo acorde al jugador que esta
+        muerto.
+
+        @param [in] jugador_hum es un puntero a la estructura jugador_t que contiene
+        la informacion de estado del jugador humano.
+
+        @param [in] jugador_hum es un puntero a la estructura jugador_t que contiene
+        la informacion de estado del jugador maquina.
+
+        @pre Ambos punteros deben apuntar a memorias != NULL de tipo jugador_t
+
+        @return HUMANO  si el jugador humano esta muerto, MAQUINA si la maquina esta muerta,
+        AMBOS si ambos estan muertos (caso que podria ocurrir si en el ultimo turno ambos atacan
+        y ambos mueren).
+
+        @post Se devuelve el valor correspondiente al jugador que esta muerto.
+
+        @invariant ninguna de las estructuras proporcionadas son modificadas.
+    */
+    int determ_jug_muerto(const jugador_t *const jugador_hum, const jugador_t *const jug_maquina); 
 #endif
