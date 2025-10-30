@@ -1,7 +1,5 @@
 #ifndef COMBATE
     #define COMBATE
-    #define EULER 2.7182818
-    #define CONST_DEFENSA 0.7
     #define CONST_ACCION_DEFENSA 0.5
 
     #include<stdio.h>
@@ -9,7 +7,26 @@
     #include<string.h>
     #include<stdbool.h>
     #include<math.h>
-    #include "combate.h"
+    #include "personaje.h" 
+   
+    typedef struct
+    {
+        char accion_jugad[32];
+        char accion_maquin[32];
+        int vida_restante_jugador;
+        int energia_restante_jugador;
+        int vida_restante_maquina;
+        int energia_restante_maquina;
+        size_t turno;
+        bool mem_ped_correct;
+    }turno_t;
+
+    typedef enum
+    {
+        RANGO_INVALIDO = -3,
+        DEMASIADOS_ATAQUES,
+        ENERGIA_INSUFIC
+    }errores_accion_t;
 
     typedef enum
     { 
@@ -17,29 +34,15 @@
         ATAQUE,
         DEFENSA,
         CURAR,
-        RANDOM
+        RANDOM,
+        INVALIDA
     }accion_activa_t;
 
-    typedef struct
+    typedef enum
     {
-        int vida; //Vida del personaje. Puede estar en el rango de [1300 - 1700].
-        int energia; //Energia del personaje. Puede estar en el rango de [70 - 100]. 
-        int ataque; //Plus de ataque del personaje. Puede en el rango [50 - 70].
-        int curacion; //Capacidad de curacion del personaje. Rango: [200 - 350].
-        int aumento_energia; //Aumento de energia producido en la accion de curar.
-        int reduc_energ_ataq; //Cantidad de energia reducida al realizar un ataque.
-        float red_danio; //Toma su valor del macro CONST_DEFENSA. 
-    }personaje_t;
-
-
-    typedef struct
-    {
-        int vida;
-        int energia;
-        bool defensa; //Decision de aplicar o no la reduccion de la defensa.
-        bool vivo;
-        personaje_t personaje;
-    }jugador_t;
+        ENERGIA_BAJA = 10,
+        VIDA_BAJA = 100,
+    }estadisticas_bajas_t;
 
     typedef struct
     {
@@ -76,70 +79,6 @@
         AMBOS,
     }jugador_muerto_t;
 
-    typedef struct
-    {
-        char accion_jugad[32];
-        char accion_maquin[32];
-        int vida_restante_jugador;
-        int escudo_restante_jugador;
-        int energia_restante_jugador;
-        int vida_restante_maquina;
-        int escudo_restante_maquina;
-        int energia_restante_maquina;
-        size_t turno;
-        bool mem_ped_correct;
-    }turno_t;
-
-    /**
-        @brief Esta funcion crea un arreglo dinamico de elementos de tipo turno_t 
-        de capacidad tamanio.
-
-        @param tamanio es el tamanio del arreglo que se quiere crear.
-
-        @return un puntero a la memoria dinamica donde se aloja el recurso del 
-        arreglo de turno_t(s).
-
-        @post Se creo y retorno el recurso pedido, de tamanio tamanio.
-
-        @invariant tamanio no cambia de valor.
-    */
-    turno_t *crear_arreglo_turnos(const size_t tamanio);
-    
-    /**
-        @brief La funcion agrega una cantidad de elementos a un arreglo de turno_t(s).
-
-        @param [out] arr_turno es un puntero al arreglo de turno_t al que se quiere
-        agregar mas elementos.
-
-        @param cant_actual es la cantidad actual de elementos del arreglo.
-
-        @param cant_agregar es la cantidad de elementos que se quiere agregar.
-
-        @pre cant_actual debe ser > 0. cant_agregar debe ser > 0.
-
-        @return un puntero a un nuevo arreglo dinamico de tamanio cant_actual + 
-        cant_agregar.
-    */
-    turno_t *agregar_turno(turno_t *arr_turno, size_t cant_actual, size_t cant_agregar);
-    
-    /**
-        @brief Esta funcion crea un arreglo dinamico de elementos de tipo personaje_t
-        de capacidad tamanio.
-        
-        @details La funcion llamadora es encargada de liberar el recurso creado 
-        haciendo uso de la funcion 'destruir_memoria'.
-
-        @param tamanio es el tamanio del cual se quiere crear el arreglo.
-
-        @pre tamanio deb ser > 0.
-
-        @return un puntero a la memoria del heap donde se aloja el recuros recien
-        creado.
-
-        @post Se creo y retorno el recurso de tamanio tamanio.
-    */
-    personaje_t *crear_arreglo_personajes(const size_t tamanio);
-
     /**
         @brief Esta funcion toma la accion del jugador y la convierte a una cadena.
 
@@ -166,20 +105,6 @@
         el valor NULL.
     */
     void destruir_memoria(void **ptr_mem);
-    
-    /**
-        @brief Esta funcion imprime un personaje_t.
-
-        @param [in] personaje es un puntero a la estructura de tipo personaje_t
-        que desea imprimirse.
-
-        @pre personaje debe ser un puntero a una direccion != NULL de tipo personaje_t.
-
-        @post Se imprimio el personaje. 
-
-        @invariant personaje no es modificado.
-    */
-    void imprimir_personaje(const personaje_t *const personaje);
 
     /**
         @brief Esta funcion llena una estructura de tipo turno_t.
@@ -218,7 +143,6 @@
     const jugador_t *const maquina, const size_t turno, int accion_jugad, 
     int accion_maquin);
 
-    
     /**
         @brief Esta funcion imprime una estructura de tipo turno_t
 
@@ -232,20 +156,6 @@
         @invariant turno no es modificado.
     */
     void imprimir_turno(const turno_t *const turno_print);
-
-    /**
-        @brief Esta funcion crea un personaje con estadisticas random y lo devuelve.
-
-        @details Esta funcion utilizara mucho la funcion rand() para obtener valores
-        random dentro de un cierto rango, para asegurar que cada vez los personajes
-        tengan estadisticas diferentes.Los rangos son los especificados en la 
-        documentacion de la estructura personaje_t.
-
-        @return Un personaje_t con estadisticas random.
-
-        @post El personaje creado y retornado tiene estadisticas elegidas al azar.
-    */
-    personaje_t crear_personaje_random();
 
     /**
         @brief Reduce la energia de un jugador.
@@ -331,7 +241,7 @@
 
         @post La estructura jugador_en_defensa NO es modificadas.
     */
-    defensa_t calcular_defensa(jugador_t *jugador_en_defensa, 
+    defensa_t calcular_defensa(const jugador_t *const jugador_en_defensa, 
     const int danio_causado);
 
     /**
@@ -401,7 +311,7 @@
         estan detallados en la seccion 'details'.
     */
     int decision_accion_maquina(const jugador_t *const jug_humano, 
-    const jugador_t *const jug_maquina);
+    const jugador_t *const jug_maquina, int accion_jug);
 
     /**
         @brief La funcion modifica una estructura de tipo jugador_t con los  
@@ -463,4 +373,98 @@
         @invariant ninguna de las estructuras proporcionadas son modificadas.
     */
     int determ_jug_muerto(const jugador_t *const jugador_hum, const jugador_t *const jug_maquina); 
+
+    /**
+        @brief Esta funcion se encarga de resolver las acciones de ambos jugadores en un turno.
+
+        @details La funcion se encarga de llenar las estructuras de tipo accion_jugador_t con las acciones
+        realizadas por los jugadores en el turno. Recibe punteros a las estructuras del jugador y de la 
+        maquina para poder resolver las acciones realizadas correctamente. 
+        Recibe punteros a dos estructuras de tipo accion_jugador_t donde llenara la estructura correspondiente
+        con los datos de la accion del jugador y de la maquina.
+        Se modifican estructuras declaradas fuera de la funcion ya que, al tener 4 estructuras dentro de si, 
+        seria un peso alto de retorno.
+        Hace uso de las funciones 
+
+        @param [in, out] jugador es un puntero a la estructura de tipo jugador_t que contiene la informacion 
+        del jugador humano pertinente para la resolucion de las acciones.
+
+        @param [in, out] maquina es un puntero a la estructura de tipo jugador_t que contiene la informacion 
+        de la  maquina pertinente para la resolucion de las acciones.
+
+        @param accion_jugador es un entero que representa la accion tomada por el jugador en el turno.
+        Este entero es uno de los que aparecen en enum accion_activa_t.
+
+        @param accion_maquina es un entero que representa la accion tomada por la maquina en el turno.
+        Este entero es uno de los que aparecen en enum accion_activa_t.
+
+        @param [out] acciones_jugador es un puntero a la estructura que contendra la accion del jugador.
+        
+        @param [out] acciones_maquina es un puntero a la estructura que contendra la accion de la maquina.
+
+        @pre acciones_jugador y acciones_maquina deben ser puntero a estructuras VACIAS (para evitar errores)
+        de tipo accion_jugador_t. maquina y jugador deben ser puntero a estructuras de tipo jugador_t con todos
+        los datos pertinentes (como vida, energia, personaje) inicializados.
+
+        @post Los campos de las  estrucutras 'acciones_jugador' y 'acciones_maquina' han sido llenadas con los
+        datos pertinentes.
+
+        @invariant accion_maquina y accion_jugador no cambian.
+    */
+    void resolucion_acciones(const jugador_t *const jugador, const jugador_t *const maquina, 
+    int accion_jugador, int accion_maquina, accion_jugador_t *acciones_jugador, 
+    accion_jugador_t *acciones_maquina);
+
+    /** 
+        @brief Esta funcion actualiza la estadistica de la defensa de un jugador.
+
+        @details La funcion actualiza el miembro defensa del jugador. Si la accion es == CURAR, 
+        divide a la mitad el miembro defensa. Si la accion es != CURAR, entonces lo restaura (de ser
+        necesario) a la capacidad maxima del personaje del jugador.
+
+        @param [in, out] jugador es un puntero a una estructura de tipo jugador_t del jugador del
+        cual se quiere modificar su estadistica de defensa.
+        
+        @param accion es la accion que realizo el jugador.
+    */
+    void actualizar_defensa_por_accion(jugador_t *jugador, int accion);
+
+    /**
+        @brief imprime un separador usando el caracter '='
+
+        @details crea un separador de 35 '='. Agrega un "\n" al final.
+    */
+    void imprimir_separador_sig_igual();
+
+    /**
+        @brief Esta funcion comprueba que el jugador tenga suficiente energia para poder
+        realizar la accion de ATAQUE.
+
+        @param [in] jugador es un puntero a la estructura de tipo jugador_t donde se alojan los
+        datos del jugador humano. Se usara para leer la energia y compararla contra el minimo requerido para
+        atacar.
+
+        @param accion_jugador es un entero, proveniente de la struct accion_activa_t, que representa la
+        accion realizada por el jugador. Se usa para comprobar la energia solo si se intento atacar.
+
+        @pre jugador debe ser un puntero a una estructura de tipo jugador_t ya inicializada con los
+        datos pertinentes del jugador.
+
+        @return INVALIDA si tiene insuficiente energia. Si tiene suficiente energia, retorna 1. (este valor
+        no es importante debido a como se maneja la logica en el main).
+    */
+    int comprobar_energ_ataq(const jugador_t *const jugador, int accion_jugador);
+
+    /**
+        @brief Esta funcion comprobara que la desicion de accion del jugador siga las reglas estipuladas
+        por ej juego.
+
+        @
+    */
+    int verific_valid_accion_jug(jugador_t *jugador, const int accion_jugador, int ataques_seguidos);
+
+    void mostrar_opciones_accion();
+
+    void verif_lect_correcta_accion(int *accion_jugador);
+
 #endif
