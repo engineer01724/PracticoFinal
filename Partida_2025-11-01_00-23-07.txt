@@ -1,0 +1,62 @@
+  Accion realizada por el jugador: NINGUNA (inicio del juego)
+  Accion realizada por la maquina: NINGUNA (inicio del juego)
+  Vida restante del jugador: 202
+  Energia restante del jugador: 52
+  Vida restante de la maquina: 202
+  Energia restante de la maquina: 52
+Turno numero 1
+  Accion realizada por el jugador: DEFENSA
+  Accion realizada por la maquina: ATAQUE
+  Vida restante del jugador: 145
+  Energia restante del jugador: 52
+  Vida restante de la maquina: 202
+  Energia restante de la maquina: 42
+Turno numero 2
+  Accion realizada por el jugador: ATAQUE
+  Accion realizada por la maquina: DEFENSA
+  Vida restante del jugador: 145
+  Energia restante del jugador: 42
+  Vida restante de la maquina: 145
+  Energia restante de la maquina: 52
+Turno numero 3
+  Accion realizada por el jugador: ATAQUE
+  Accion realizada por la maquina: DEFENSA
+  Vida restante del jugador: 145
+  Energia restante del jugador: 32
+  Vida restante de la maquina: 88
+  Energia restante de la maquina: 52
+Turno numero 4
+  Accion realizada por el jugador: CURAR
+  Accion realizada por la maquina: ATAQUE
+  Vida restante del jugador: 94
+  Energia restante del jugador: 43
+  Vida restante de la maquina: 88
+  Energia restante de la maquina: 42
+Turno numero 5
+  Accion realizada por el jugador: DEFENSA
+  Accion realizada por la maquina: CURAR
+  Vida restante del jugador: 94
+  Energia restante del jugador: 52
+  Vida restante de la maquina: 144
+  Energia restante de la maquina: 52
+Turno numero 6
+  Accion realizada por el jugador: ATAQUE
+  Accion realizada por la maquina: ATAQUE
+  Vida restante del jugador: 12
+  Energia restante del jugador: 42
+  Vida restante de la maquina: 62
+  Energia restante de la maquina: 42
+Turno numero 7
+  Accion realizada por el jugador: DEFENSA
+  Accion realizada por la maquina: CURAR
+  Vida restante del jugador: 12
+  Energia restante del jugador: 52
+  Vida restante de la maquina: 118
+  Energia restante de la maquina: 52
+Turno numero 8
+  Accion realizada por el jugador: ATAQUE
+  Accion realizada por la maquina: ATAQUE
+  Vida restante del jugador: 0
+  Energia restante del jugador: 42
+  Vida restante de la maquina: 36
+  Energia restante de la maquina: 42

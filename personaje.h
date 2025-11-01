@@ -7,7 +7,6 @@
     #include<stdlib.h>
     #include<string.h>
     #include<stdbool.h>
-    #include<math.h>
     
     typedef struct
     {
@@ -23,8 +22,32 @@
     
     typedef struct jugador jugador_t;
 
-   
-   /**
+    typedef enum 
+    {
+        VIDA_MIN = 200,
+        VIDA_MAX = 250,
+
+        ENERGIA_MIN = 50,
+        ENERGIA_MAX = 65,
+
+        ATAQUE_MIN = 65,
+        ATAQUE_MAX = 80,
+
+        DEFENSA_MIN = 50,
+        DEFENSA_MAX = 64,
+
+        CURACION_MIN = 55,
+        CURACION_MAX = 70,
+
+        AUMENTO_ENERGIA_MIN = 10,
+        AUMENTO_ENERGIA_MAX = 15,
+
+        REDUC_ENERG_ATAQ_MIN = -15, 
+        REDUC_ENERG_ATAQ_MAX = -10
+
+    }limites_stats_t;
+
+    /**
         @brief CONSTUCTOR. Crea un jugador de manera dinamica (en el heap).
 
         @details La funcion llamadora debe liberar la memoria haciendo uso de la
@@ -139,7 +162,7 @@
         @pre jugador tiene que ser un puntero a una estructura opaca jugador_t
         != NULL.
 
-        @return un puntero de sololectura al personaje del jugador que fue pasado 
+        @return un puntero de solo lectura al personaje del jugador que fue pasado 
         por parametro.
 
         @invariant jugador no es modificado.
@@ -226,6 +249,17 @@
     personaje_t *crear_arreglo_personajes(const size_t tamanio);
 
     /**
+        @brief Esta funcion destruye memoria dinamica previamente pedida.
+        
+        @param [in, out] ptr_mem es un puntero al puntero que apunta a la direccion 
+        dinamica que se desea liberar.
+
+        @post Se libero la memoria dinamica y al puntero a la misma se le ha asignado 
+        el valor NULL.
+    */
+    void destruir_memoria(void **ptr_mem);
+
+    /**
         @brief ITERADOR. Esta funcion imprime un personaje_t.
 
         @param [in] personaje es un puntero a la estructura de tipo personaje_t
@@ -242,7 +276,10 @@
     /**
         @brief Crea un personaje_t con estadisticas random.
 
-        
+        @details Haciendo uso de la funcion rand(), crea un personaje con estadisticas dentro de 
+        los sgts rangos: vida: [400 - 500]. energia: [65 - 50]. ataque: [65 - 80] defensa: [50 - 64].
+        curacion: [55 - 70]. aumeto_energia: [10 - 15]. reduccion de energia: [10 - 15]. Factor de
+        reduccion de la defensa: constante (0.7).
     */
     personaje_t crear_personaje_random();
 

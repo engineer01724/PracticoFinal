@@ -1,0 +1,1 @@
+Score entre Jugador y Maquina: Jugador: 15, Maquina: 10.
