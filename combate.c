@@ -7,15 +7,6 @@
 #include "combate.h"
 
 
-void destruir_memoria(void **ptr_mem)
-{
-    if((ptr_mem != NULL) && (*ptr_mem != NULL))
-    {
-        free(*ptr_mem);
-        *ptr_mem = NULL;
-    }  
-}
-
 char *accion_a_cadena(int accion_jugador)
 {   
     char *accion_jug = NULL;
@@ -144,7 +135,6 @@ ataque_t calcular_ataque(const jugador_t *const jugad_atacado,
 const jugador_t *const jugad_atacante)
 {
     ataque_t ataque_retorno;
-    const personaje_t *personaje_jug_atacado = jugador_obtener_personaje(jugad_atacado);
     const personaje_t *personaje_jug_atacante = jugador_obtener_personaje(jugad_atacante);
     int ataque_jug = personaje_jug_atacante->ataque;
     int energia_jug = personaje_jug_atacante->energia;
@@ -164,7 +154,7 @@ defensa_t calcular_defensa(const jugador_t *const jugador_en_defensa, const int 
     const personaje_t *personaje_jugador = jugador_obtener_personaje(jugador_en_defensa); 
     defensa_t defensa_retorno;
     int energia_a_sumar = personaje_jugador->aumento_energia;
-    int danio_final = danio_causado * 0.5;
+    int danio_final = danio_causado * CONST_DEFENSA;
 
     defensa_retorno.danio_luego_reduction = danio_final;
     defensa_retorno.energia_ganada = (int)(energia_a_sumar * 1.5);
@@ -536,4 +526,20 @@ void imprimir_separador_sig_igual()
         fprintf(stdout, "=");
     }
     fprintf(stdout, "\n");
+}
+
+void imprim_ganador(int jugador_muerto)
+{
+    switch(jugador_muerto)
+    {
+        case HUMANO:
+            fprintf(stdout, "La maquina ha ganado. :(");
+            break;
+        case MAQUINA:
+            fprintf(stdout, "El jugador ha ganado!");
+            break;
+        case AMBOS:
+            fprintf(stdout, "Se ha producido un empate! (Ambos jugadores realizaron un ataque fatal en el ultimo turno de la partida)");
+            break;
+    }
 }

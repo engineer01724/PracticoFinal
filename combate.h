@@ -1,6 +1,5 @@
 #ifndef COMBATE
     #define COMBATE
-    #define CONST_ACCION_DEFENSA 0.5
 
     #include<stdio.h>
     #include<stdlib.h>
@@ -94,17 +93,6 @@
         @return un puntero a una cadena con la accion realizada.
     */
     char *accion_a_cadena(int accion_jugador);
-
-    /**
-        @brief Esta funcion destruye memoria dinamica previamente pedida.
-        
-        @param [in, out] ptr_mem es un puntero al puntero que apunta a la direccion 
-        dinamica que se desea liberar.
-
-        @post Se libero la memoria dinamica y al puntero a la misma se le ha asignado 
-        el valor NULL.
-    */
-    void destruir_memoria(void **ptr_mem);
 
     /**
         @brief Esta funcion llena una estructura de tipo turno_t.
@@ -467,4 +455,22 @@
 
     void verif_lect_correcta_accion(int *accion_jugador);
 
+    /**
+        @brief Esta funcion imprime un mensaje que anuncia quien gano.
+
+        @warning No llamar a esta funcion dentro del proceso del juego, ya que
+        la funcion esta pensada para mostrar quien fue el ganador.
+
+        @details La funcion evalua el dato almacenado en jugador_muerto y,
+        en base a el, imprime un mensaje anunciando ganador/perdedor/empate.
+
+        @param jugador_muerto es un valor que representa alguno de los estados
+        listados en jugador_muerto_t (excepto NINGUNO).
+
+        @pre jugador_muerto debe ser uno de los valores listados en jugador_muerto_t
+        (no puede ser = NINGUNO).
+
+        @post Se imprimio el mensaje que anuncia al ganador.
+    */
+    void imprim_ganador(int jugador_muerto);
 #endif

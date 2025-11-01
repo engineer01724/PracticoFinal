@@ -1,0 +1,98 @@
+===================================
+  Accion realizada por el jugador: NINGUNA (inicio del juego)
+  Accion realizada por la maquina: NINGUNA (inicio del juego)
+  Vida restante del jugador: 216
+  Energia restante del jugador: 62
+  Vida restante de la maquina: 216
+  Energia restante de la maquina: 62
+===================================
+===================================
+Turno numero 1:
+  Accion realizada por el jugador: ATAQUE
+  Accion realizada por la maquina: DEFENSA
+  Vida restante del jugador: 216
+  Energia restante del jugador: 50
+  Vida restante de la maquina: 163
+  Energia restante de la maquina: 62
+===================================
+===================================
+Turno numero 2:
+  Accion realizada por el jugador: DEFENSA
+  Accion realizada por la maquina: ATAQUE
+  Vida restante del jugador: 163
+  Energia restante del jugador: 62
+  Vida restante de la maquina: 163
+  Energia restante de la maquina: 50
+===================================
+===================================
+Turno numero 3:
+  Accion realizada por el jugador: ATAQUE
+  Accion realizada por la maquina: DEFENSA
+  Vida restante del jugador: 163
+  Energia restante del jugador: 50
+  Vida restante de la maquina: 110
+  Energia restante de la maquina: 62
+===================================
+===================================
+Turno numero 4:
+  Accion realizada por el jugador: CURAR
+  Accion realizada por la maquina: CURAR
+  Vida restante del jugador: 216
+  Energia restante del jugador: 60
+  Vida restante de la maquina: 168
+  Energia restante de la maquina: 62
+===================================
+===================================
+Turno numero 5:
+  Accion realizada por el jugador: DEFENSA
+  Accion realizada por la maquina: ATAQUE
+  Vida restante del jugador: 163
+  Energia restante del jugador: 62
+  Vida restante de la maquina: 168
+  Energia restante de la maquina: 50
+===================================
+===================================
+Turno numero 6:
+  Accion realizada por el jugador: ATAQUE
+  Accion realizada por la maquina: ATAQUE
+  Vida restante del jugador: 86
+  Energia restante del jugador: 50
+  Vida restante de la maquina: 91
+  Energia restante de la maquina: 38
+===================================
+===================================
+Turno numero 7:
+  Accion realizada por el jugador: DEFENSA
+  Accion realizada por la maquina: CURAR
+  Vida restante del jugador: 86
+  Energia restante del jugador: 62
+  Vida restante de la maquina: 149
+  Energia restante de la maquina: 48
+===================================
+===================================
+Turno numero 8:
+  Accion realizada por el jugador: ATAQUE
+  Accion realizada por la maquina: ATAQUE
+  Vida restante del jugador: 9
+  Energia restante del jugador: 50
+  Vida restante de la maquina: 72
+  Energia restante de la maquina: 36
+===================================
+===================================
+Turno numero 9:
+  Accion realizada por el jugador: DEFENSA
+  Accion realizada por la maquina: CURAR
+  Vida restante del jugador: 9
+  Energia restante del jugador: 62
+  Vida restante de la maquina: 130
+  Energia restante de la maquina: 46
+===================================
+===================================
+Turno numero 10:
+  Accion realizada por el jugador: ATAQUE
+  Accion realizada por la maquina: ATAQUE
+  Vida restante del jugador: 0
+  Energia restante del jugador: 50
+  Vida restante de la maquina: 53
+  Energia restante de la maquina: 34
+===================================

@@ -16,7 +16,7 @@
         historial_turnos_t haciendo uso de la funcion malloc.
         
         @details La funcion llamadora es la encargada de liberar la memoria de la 
-        lista y de todos sus nodos haciendo uso de la funcion: 
+        lista y de todos sus nodos haciendo uso de la funcion 'historial_destruir'
 
         @return un puntero a la direccion en el heap donde se encuentra el inicio de la 
         lista enlazada. Si fallo la operacion, devuelve NULL.
@@ -82,7 +82,7 @@
 
         @param [in] historial es un puntero al historial de turnos.
 
-        @pre historial debe ser un puntero != NULL a una esturctura opaca historia_turnos_t.
+        @pre historial debe ser un puntero != NULL a una esturctura opaca historial_turnos_t.
 
         @return un puntero hacia ultimo turno_t agregado al historial.
 
@@ -90,6 +90,34 @@
 
         @invariant historial no es modificado.
     */
-    const turno_t *historial_ultim_turno(const historia_turnos_t *historial);
+    const turno_t *historial_ultim_turno(const historial_turnos_t *historial);
+
+    /**
+        @brief Esta funcion guarda la partida jugada en un archivo de nombre nombre_arch.
+
+        @param [in] historial es un puntero al inicio del historial de turnos. Se usara para
+        saber desde donde iniciar a iterar para conseguir los turnos.
+
+        @param [in] nombre_arch es una cadena con el nombre que se le pondra al archivo en el que 
+        se guardara el historial de turnos de la partida.
+
+        @pre nombre_arch debe ser un puntero != NULL con una cadena valida para guardar el nombre 
+        del archivo. historial debe ser un puntero != NULL a una estructura historial_turnos_t.
+
+        @return true si la operacion fue un exito. false si hubo algun error al imprimir la partida
+        en el archivo.
+
+        @post Se guardo el historial de turnos en el archivo de nombre nombre_arch.
+
+        @invariant historial y nombre_arch NO se ven modificados.
+    */
+    bool historial_guardar_archivo(const historial_turnos_t *historial, const char *nombre_arch);
+
+    /**
+        @brief imprime un separador en un flujo de archivo usando el caracter '='.
+
+        @details crea un separador de 35 '='. Agrega un "\n" al final.
+    */
+    void imprimir_separador_archivo(FILE *archivo);
 
 #endif
