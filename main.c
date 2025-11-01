@@ -3,33 +3,27 @@
 #include<string.h>
 #include<stdbool.h>
 #include<time.h>   
+#include<math.h>
 #include "combate.h"
 #include "personaje.h"
 #include "historial.h"
-#include "score.h"
 
 int main(void)
 {
     srand(time(NULL));
-    time_t hora = time(NULL);
-    struct tm *info_tiempo = localtime(&hora);
-    char nombre_archivo[64];
     bool exito_primer_turno = true;
-    bool exito_actualiz_score = true;
-    bool obtener_score = true;
-    bool exito_guardar_partida = true;
     int jugador_muerto = NINGUNO; 
     size_t num_personaje_human = 0;
     size_t num_personaje_maquin = 0;
     size_t num_turnos = 1;
     size_t cant_personajes = 3;
-    historial_turnos_t *turnos = NULL;
+    historia_turnos_t *turnos = NULL;
     personaje_t *personajes = NULL;
     personaje_t personaje_random = {0};
     jugador_t *jugador = NULL;
     jugador_t *maquina = NULL;
     turno_t turno_inicial = {0};
-    score_t score_actual = {0};
+    
 
     turnos = crear_historial_turnos();
     if(turnos == NULL)
@@ -50,17 +44,6 @@ int main(void)
         personajes[i] = personaje_random; 
     }
     fprintf(stdout, "Juego de combate, jugador vs IA\n");
-
-    obtener_score = obtener_score_global(&score_actual);
-    if(obtener_score == false)
-    {
-        fprintf(stderr, "Error al abrir el archivo del score. Esta partida no sera resgitrada en el score");
-    }
-    else
-    {
-        escribir_lider_score(&score_actual);
-    }
-
     fprintf(stdout, "Se le mostraran 3 personajes. Elija el numero del personaje");
     fprintf(stdout, " que desea usar.\n");
     imprimir_separador_sig_igual();
@@ -120,7 +103,7 @@ int main(void)
         accion_jugador_t acciones_jugador = {0};
         accion_jugador_t acciones_maquina = {0};
         turno_t turno_temp = {0};
-        const turno_t *ptr_ultimo_turno = NULL;
+        turno_t *ptr_ultimo_turno = NULL;
 
         if(i == 0)
         {
@@ -131,6 +114,7 @@ int main(void)
         }
         else
         {
+
             ptr_ultimo_turno = historial_ultim_turno(turnos);
             imprimir_separador_sig_igual();
 
@@ -140,28 +124,36 @@ int main(void)
             
             imprimir_separador_sig_igual();
         }
-        
-        do
+
+        mostrar_opciones_accion();
+        verif_lect_correcta_accion(&accion_jugador);
+
+        while(verif_accion_jug != accion_jugador)
         {
-            mostrar_opciones_accion();
-            verif_lect_correcta_accion(&accion_jugador); 
-
             verif_accion_jug = verific_valid_accion_jug(jugador, accion_jugador, ataques_seguidos);
-
             if(verif_accion_jug == RANGO_INVALIDO)
             {
                 fprintf(stdout, "Rango de seleccion invalido. Intente nuevamente\n");
+                fprintf(stdout, "Reiteracion de las opciones:\n");
+                mostrar_opciones_accion();
+                verif_lect_correcta_accion(&accion_jugador);
             }
-            else if(verif_accion_jug == DEMASIADOS_ATAQUES)
+            else
+            if(verif_accion_jug == DEMASIADOS_ATAQUES)
             {
                 fprintf(stdout, "Limite de ataques seguidos (3) alcanzado. Seleccione otra opcion\n");
+                fprintf(stdout, "Reiteracion de las opcioens:");
+                mostrar_opciones_accion();
+                verif_lect_correcta_accion(&accion_jugador);
             }
-            else if(verif_accion_jug == ENERGIA_INSUFIC)
+            else
+            if(verif_accion_jug == ENERGIA_INSUFIC)
             {
                 fprintf(stdout, "Energia insuficiente para atacar. Seleccione otra opcion\n");
+                mostrar_opciones_accion();
+                verif_lect_correcta_accion(&accion_jugador);
             }
-
-        } while(verif_accion_jug != accion_jugador); 
+        }
 
         if (accion_jugador == ATAQUE)
         {
@@ -176,7 +168,7 @@ int main(void)
         fprintf(stdout, "Accion numero %d elegida correctamente\n", accion_jugador);
         fprintf(stdout, "IA eligiendo accion random\n\n");
         
-        accion_maquina = decision_accion_maquina(jugador, maquina, accion_jugador); 
+        accion_maquina = decision_accion_maquina(&jugador, &maquina, accion_jugador); 
         fprintf(stdout, "IA elige la opcion numero %d\n", accion_maquina);
 
         actualizar_defensa_por_accion(jugador, accion_jugador);
@@ -185,8 +177,8 @@ int main(void)
         resolucion_acciones(jugador, maquina, accion_jugador, accion_maquina, &acciones_jugador, 
         &acciones_maquina);
 
-        modificar_jugador(jugador, &acciones_jugador, accion_jugador, accion_maquina);
-        modificar_jugador(maquina, &acciones_maquina, accion_maquina, accion_jugador);
+        modificar_jugador(&jugador, &acciones_jugador, accion_jugador, accion_maquina);
+        modificar_jugador(&maquina, &acciones_maquina, accion_maquina, accion_jugador);
         
         turno_temp = llenar_struct_turno(jugador, maquina, i + 1, accion_jugador, accion_maquina);
         exito_insert_turn = historial_agregar_fin(turnos, &turno_temp);
@@ -197,39 +189,11 @@ int main(void)
         }
         jugador_muerto = determ_jug_muerto(jugador, maquina);
     }
-    
+
     fprintf(stdout, "\nJuego terminado!\n");
-
-    modif_score_segun_ganad(&score_actual, jugador_muerto);
-    imprim_ganador(jugador_muerto);
-
-    fprintf(stdout, "\nScore actualizado luego de la partida:\n");
-    escribir_lider_score(&score_actual);
-
-    if(obtener_score == true)
-    {
-        exito_actualiz_score = escribir_score_global(&score_actual);
-        if(exito_actualiz_score == false)
-        {
-            fprintf(stderr, "Error al actualizar el archivo con el score. Partida no considerada en el score");
-        }
-    }
-
-    if((obtener_score == true) && (exito_actualiz_score == true))
-    {
-        strftime(nombre_archivo, sizeof(nombre_archivo), "Partida_Fecha_%Y-%m-%d_%H-%M-%S.txt", info_tiempo);
-        fprintf(stdout, "Se guardara su partida en el archivo %s", nombre_archivo);
-        exito_guardar_partida = historial_guardar_archivo(turnos, nombre_archivo);
-        if(exito_guardar_partida == false)
-        {
-            fprintf(stdout, "No se pudo guardar la partida.");
-            perror("Error al guardar la partida en el archivo");
-        }
-    }
-
+    
     historial_destruir(&turnos);
     destruir_memoria((void **)&personajes);
-    destruir_jugador(&jugador);
-    destruir_jugador(&maquina);
+
     return EXIT_SUCCESS;
 }
